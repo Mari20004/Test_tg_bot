@@ -149,7 +149,7 @@ def next_step(message):
 def all_right(message):
     chat_id = message.chat.id
     keyboard = telebot.types.ReplyKeyboardRemove()
-    bot.send_message(chat_id, "Вы прошли регистрацию, поздравляю!", reply_markup=keyboard)
+    bot.send_message(chat_id, "Вы прошли регистрацию, поздравляю вас", reply_markup=keyboard)
 
 if __name__ == "__main__":
     print("Бот запущен")
