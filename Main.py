@@ -5,6 +5,7 @@ bot = telebot.TeleBot(token)
 users = {}
 flag_name_surname = 0
 
+# Приветствие и запросить имя
 @bot.message_handler(commands=['start'])
 def welcome(message):
     global flag_name_surname
@@ -15,6 +16,7 @@ def welcome(message):
     users[chat_id] = {}
     bot.register_next_step_handler(message, username)
 
+# Сохранить имя и запросить фамилию
 def username(message):
     chat_id = message.chat.id
     name = message.text
@@ -22,12 +24,14 @@ def username(message):
     bot.send_message(chat_id, "Отлично, теперь введи свою фамилию")
     bot.register_next_step_handler(message, surname)
 
+# Сохранить фамилию
 def surname(message):
     chat_id = message.chat.id
     sur_name = message.text
     users[chat_id]["surname"] = sur_name
     saving(message)
 
+# Проверка имени и фамилии
 def saving(message):
     chat_id = message.chat.id
     bot.send_message(chat_id, f"Имя: {users[chat_id]["name"]}\nФамилия: {users[chat_id]["surname"]}")
@@ -39,6 +43,7 @@ def saving(message):
     keyboard.add(button2, button3)
     bot.send_message(chat_id, "Данные верны?", reply_markup=keyboard)
 
+# Подтвердить имя и фамилию
 @bot.message_handler(func=lambda message: message.text == "Да")
 def func1(message):
     chat_id = message.chat.id
@@ -46,6 +51,7 @@ def func1(message):
     bot.send_message(chat_id, "Отлично", reply_markup=keyboard)
     where_from(message)
 
+# Изменить имя
 @bot.message_handler(func=lambda message: message.text == "Изменить имя")
 def reg_new_name(message):
     keyboard = telebot.types.ReplyKeyboardRemove()
@@ -53,6 +59,7 @@ def reg_new_name(message):
     bot.send_message(chat_id, "Введи свое имя еще раз", reply_markup=keyboard)
     bot.register_next_step_handler(message, change_name)
 
+# Сохранение измененного имени
 def change_name(message):
     global flag_name_surname
     chat_id = message.chat.id
@@ -62,6 +69,7 @@ def change_name(message):
     if flag_name_surname == 1: next_step(message)
     else: saving(message)
 
+# Изменить фамилию
 @bot.message_handler(func=lambda message: message.text == "Изменить фамилию")
 def reg_new_surname(message):
     chat_id = message.chat.id
@@ -69,6 +77,7 @@ def reg_new_surname(message):
     bot.send_message(chat_id, "Введите свою фамилию еще раз", reply_markup=keyboard)
     bot.register_next_step_handler(message, change_surname)
 
+# Сохранение измененной фамилии
 def change_surname(message):
     chat_id = message.chat.id
     sur_name = message.text
@@ -77,6 +86,7 @@ def change_surname(message):
     if flag_name_surname == 1: next_step(message)
     else: saving(message)
 
+# Запросить страну
 @bot.message_handler(func=lambda message: message.text == "Изменить страну")
 def where_from(message):
     global flag_name_surname
@@ -96,6 +106,7 @@ def where_from(message):
     bot.send_message(chat_id, "Из какой ты страны?", reply_markup=keyboard)
     flag_name_surname = 1
 
+# Сохранение перечневой страны
 @bot.callback_query_handler(func=lambda call: call.data in ["Россия", "Грузия", "Сербия", "Армения", "Латвия", "Литва"])
 def save_from(call):
     message = call.message
@@ -105,7 +116,7 @@ def save_from(call):
     users[chat_id]['from'] = call.data
     next_step(message)
 
-
+# Другая страна
 @bot.callback_query_handler(func=lambda call: call.data == "ani_more")
 def from_more(call):
     message = call.message
@@ -114,12 +125,14 @@ def from_more(call):
     bot.edit_message_text(chat_id=chat_id, message_id=message_id, text="Введи название своей страны")
     bot.register_next_step_handler(message, save_from_more)
 
+# Сохранение другой страны
 def save_from_more(message):
     chat_id = message.chat.id
     country = message.text
     users[chat_id]["from"] = country
     next_step(message)
 
+# Проверка всех данных
 def next_step(message):
     chat_id = message.chat.id
     keyboard = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -131,11 +144,12 @@ def next_step(message):
     keyboard.add(button2, button3, button4)
     bot.send_message(chat_id, f"Итак, Ты {users[chat_id]["name"]} {users[chat_id]["surname"]}. Твоя страна: {users[chat_id]["from"]}", reply_markup= keyboard)
 
+# Подтверждение всех данных
 @bot.message_handler(func= lambda message: message.text == "Все верно")
 def all_right(message):
     chat_id = message.chat.id
     keyboard = telebot.types.ReplyKeyboardRemove()
-    bot.send_message(chat_id, "Вы прошли регистрацию", reply_markup=keyboard)
+    bot.send_message(chat_id, "Вы прошли регистрацию, поздравляю вас", reply_markup=keyboard)
 
 if __name__ == "__main__":
     print("Бот запущен")
