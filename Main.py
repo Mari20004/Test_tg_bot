@@ -1,7 +1,11 @@
 import telebot
-from config import token
+import os
 
-bot = telebot.TeleBot(token)
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+if not BOT_TOKEN:
+    raise RuntimeError("Переменная окружения BOT_TOKEN не задана")
+
+bot = telebot.TeleBot(BOT_TOKEN)
 users = {}
 flag_name_surname = 0
 
